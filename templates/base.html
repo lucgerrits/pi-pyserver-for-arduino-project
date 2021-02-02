@@ -1,0 +1,70 @@
+{% from 'bootstrap/nav.html' import render_nav_item %}
+{% from 'bootstrap/utils.html' import render_messages %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Security camera</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    {{ bootstrap.load_css() }}
+
+    <link rel='stylesheet' href="{{ url_for('static', filename='fontawesome-free-5.15.2-web/css/all.min.css')}}">
+
+    <style>
+        pre {
+            background: #ddd;
+            padding: 10px;
+        }
+        h2 {
+            margin-top: 20px;
+        }
+        footer {
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                {{ render_nav_item('index', 'Home', use_li=True) }}
+            </ul>
+        </div>
+    </nav> -->
+    
+    <main class="container">
+        {{ render_messages(container=False, dismissible=True) }}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="text-center">
+        {% block footer %}
+            <small> &copy; <script>document.write(new Date().getFullYear())</script> <a href="#" title="Written by Grey Li">Luc Gerrits</a>
+            </small>
+        {% endblock %}
+    </footer>
+
+    {{ bootstrap.load_js() }}
+
+    <script>
+        var urlParams = new URLSearchParams(window.location.search);
+        if(urlParams.has('auto_refresh'))
+        {
+            document.getElementById("auto_refresh_state_btn").innerHTML = "ON";
+            document.getElementById("auto_refresh_state_link").href = "/";
+            window.setTimeout(function () {
+                window.location.reload();
+            }, 3000);
+        } else {
+            document.getElementById("auto_refresh_state_btn").innerHTML = "OFF";
+            document.getElementById("auto_refresh_state_link").href = "/?auto_refresh";
+        }
+    </script>
+
+</body>
+</html>

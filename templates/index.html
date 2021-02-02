@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/table.html' import render_table %}
+
+{% block content %}
+    <h1>Security camera <i class="fas fa-video"></i></h1>
+    <a id="auto_refresh_state_link" class="btn btn-secondary" style="float: right;" href="#">Auto refresh 
+        <span id="auto_refresh_state_btn" class="badge badge-info"></span>
+    </a>
+    <p>Last 50 messages received:</p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Create Time</th>
+                <th>Device ID</th>
+                <th>Angle</th>
+                <th>Distance</th>
+                <th>Image</th>
+            <tr>
+        </thead>
+        <tbody>
+            {% for key in range(messages_len, 0, -1) %}
+            <!-- list in reverse the buffer of messages -->
+            <tr>
+                <td><i class="far fa-clock"></i> {{ messages[key-1].create_time }}</td>
+                <td><i class="fas fa-fingerprint"></i> {{ messages[key-1].id }}</td>
+                <td>{{ messages[key-1].angle }}°</td>
+                <td>{{ messages[key-1].distance }}m</td>
+                <td><img src="data:image/png;base64, {{ messages[key-1].image }}" style="width:100px"></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+{% endblock %}
