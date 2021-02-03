@@ -132,7 +132,7 @@ In AP mode: http://192.168.1.10:8080/.
 
 ## On raspberry
 
-The Pi is already containing the nessesary program and conf.
+The Pi is already containing the nessesary program and conf (using [this](https://www.raspberrypi.org/documentation/configuration/wireless/access-point-routed.md)).
 
 ### Mode: normal wifi
 edit:
