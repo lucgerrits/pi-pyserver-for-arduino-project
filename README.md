@@ -5,6 +5,7 @@ A Python web server aims to receive and display Arduino messages.
 **Note**: All POST request to the API need to be formated (examples bellow) AND the http content type requires to be "binary".
 
 ## 1) Send messages
+
 A message is a **fixed length binary** that follows this rule:
 ```text
 [_____id_____][_____angle_____][_____distance_____]
@@ -28,7 +29,8 @@ With data equal to:
 
 Graphical representation:
 
- ```text                                             __________________
+```text
+                                              __________________
                                               |  Raspberry Pi  |
                                               |                |
  _________     http://192.168.1.10:8080/api   |                |
@@ -51,12 +53,11 @@ Graphical representation:
 
 ```
 
-## 2) Send messages with images
+## 2)Send messages with images
 
 A message is a **fixed length binary** (variable length **only** for image)that follows this rule:
 
 ```text
-************************** IMAGE EXAMPLE   ************************************
 
 [_____id_____][_____angle_____][_____distance_____][_____image_____]
 
@@ -66,7 +67,7 @@ A message is a **fixed length binary** (variable length **only** for image)that 
 | distance       | 6 bytes     |  000.50        |  min=000.00 ; max=999.99     |
 | image          | 0-oo bytes  |       -        |  image file untouched bytes  |
 
-************************** BASIC EXAMPLE   ************************************
+************************** IMAGE EXAMPLE   ************************************
 To send the following:
 id=luc123
 angle=110.10
