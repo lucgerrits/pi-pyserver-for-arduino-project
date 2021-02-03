@@ -166,3 +166,8 @@ sudo systemctrl stop hostapd
 sudo systemctrl enable hostapd
 sudo reboot
 ```
+
+
+## TODO
+
+* Test and fix error on web page for images (display using `<img>` and base64 encode)
