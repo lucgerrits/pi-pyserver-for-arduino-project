@@ -2,17 +2,19 @@
 
 A Python web server aims to receive and display Arduino messages.
 
-A message is a **fixed length string** that follows this rule:
+**Note**: All POST request to the API need to be formated (examples bellow) AND the http content type requires to be "binary".
+
+## 1) Send messages
+A message is a **fixed length binary** that follows this rule:
 ```text
 [_____id_____][_____angle_____][_____distance_____]
 
-|____parameter___|___Bytes___|_____example____|_______usage note_________|
-| id             | 6 bytes   |  luc123        |  use ascii char [a-Z0-9] |
-| angle          | 6 bytes   |  110.10        |  min=0.00 ; max=360.00   |
-| distance       | 6 bytes   |  000.50        |  min=0.00 ; max=999.99   |
+|____parameter___|____Bytes____|_____example____|_________usage note___________|
+| id             | 6 bytes     |  luc123        |  use ascii char [a-Z0-9]     |
+| angle          | 6 bytes     |  110.10        |  min=000.00 ; max=360.00     |
+| distance       | 6 bytes     |  000.50        |  min=000.00 ; max=999.99     |
 
-
-**************************  EXAMPLE   ************************************
+************************** BASIC EXAMPLE   ************************************
 To send the following:
 id=luc123
 angle=110.10
@@ -22,19 +24,21 @@ You'll have to send an API request to POST an HTTP request to:
 http://192.168.1.10:8080
 With data equal to:
 "luc123110.10000.50"
+```
 
 Graphical representation:
-                                              __________________
+
+ ```text                                             __________________
                                               |  Raspberry Pi  |
                                               |                |
- _________     http://192.168.1.10:8080/api    |                |
+ _________     http://192.168.1.10:8080/api   |                |
 |         |     POST: "luc123110.10000.50"    |                |
 | Arduino |  -------------------------------> |      API       |
 |         |  <------------------------------- |                |
 | sensors |              200 / OK             |       |        |
 |  data   |                                   |       |        |
 |_________|                                   |       |        |
- _________     http://192.168.1.10:8080/       |       ↓        |
+ _________     http://192.168.1.10:8080/      |       ↓        |
 |         |                GET                |                |
 | Browser |  -------------------------------> |     Website    |
 |         |  <------------------------------- |                |
@@ -45,6 +49,59 @@ Graphical representation:
 |  ----   |                                   |________________|
 |_________|
 
+```
+
+## 2) Send messages with images
+
+A message is a **fixed length binary** (variable length **only** for image)that follows this rule:
+
+```text
+************************** IMAGE EXAMPLE   ************************************
+
+[_____id_____][_____angle_____][_____distance_____][_____image_____]
+
+|____parameter___|____Bytes____|_____example____|_________usage note___________|
+| id             | 6 bytes     |  luc123        |  use ascii char [a-Z0-9]     |
+| angle          | 6 bytes     |  110.10        |  min=000.00 ; max=360.00     |
+| distance       | 6 bytes     |  000.50        |  min=000.00 ; max=999.99     |
+| image          | 0-oo bytes  |       -        |  image file untouched bytes  |
+
+************************** BASIC EXAMPLE   ************************************
+To send the following:
+id=luc123
+angle=110.10
+distance=000.50
+image=image file untouched bytes
+
+You'll have to send an API request to POST an HTTP request to: 
+http://192.168.1.10:8080
+With data equal to:
+"luc123110.10000.50xxxx..."
+```
+
+Graphical representation:
+
+```text
+                                                  __________________
+                                                  |  Raspberry Pi  |
+                                                  |                |
+ _________     http://192.168.1.10:8080/api       |                |
+|         |   POST: "luc123110.10000.50xxxx..."   |                |
+| Arduino |  ------------------------------->     |      API       |
+|         |  <-------------------------------     |                |
+| sensors |              200 / OK                 |       |        |
+|  data   |                                       |       |        |
+|_________|                                       |       |        |
+ _________     http://192.168.1.10:8080/          |       ↓        |
+|         |                GET                    |                |
+| Browser |  ------------------------------->     |     Website    |
+|         |  <-------------------------------     |                |
+|  List   |              200 / OK                 |                |
+|  data   |                                       |                |
+|  ----   |                                       |                |
+|  ----   |                                       |                |
+|  ----   |                                       |________________|
+|_________|
 
 ```
 
