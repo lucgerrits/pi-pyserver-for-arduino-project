@@ -4,7 +4,7 @@ A Python web server aims to receive and display Arduino messages.
 
 **Note**: All POST request to the API need to be formated (examples bellow) AND the http content type requires to be "binary".
 
-## 1) Send messages
+## 1 ) Send messages
 
 A message is a **fixed length binary** that follows this rule:
 ```text
@@ -53,7 +53,7 @@ Graphical representation:
 
 ```
 
-## 2)Send messages with images
+## 2 ) Send messages with images
 
 A message is a **fixed length binary** (variable length **only** for image)that follows this rule:
 
