@@ -19,7 +19,7 @@ angle=110.10
 distance=000.50
 
 You'll have to send an API request to POST an HTTP request to: 
-http://192.168.1.1:8080
+http://192.168.1.10:8080
 With data equal to:
 "luc123110.10000.50"
 
@@ -27,14 +27,14 @@ Graphical representation:
                                               __________________
                                               |  Raspberry Pi  |
                                               |                |
- _________     http://192.168.1.1:8080/api    |                |
+ _________     http://192.168.1.10:8080/api    |                |
 |         |     POST: "luc123110.10000.50"    |                |
 | Arduino |  -------------------------------> |      API       |
 |         |  <------------------------------- |                |
 | sensors |              200 / OK             |       |        |
 |  data   |                                   |       |        |
 |_________|                                   |       |        |
- _________     http://192.168.1.1:8080/       |       ↓        |
+ _________     http://192.168.1.10:8080/       |       ↓        |
 |         |                GET                |                |
 | Browser |  -------------------------------> |     Website    |
 |         |  <------------------------------- |                |
@@ -68,6 +68,43 @@ Type these commands in the terminal:
     $ pip install -r requirements.txt
     $ flask run --host=0.0.0.0 -p 8080
 
-Now go to http://127.0.0.1:8080.
+Local mode: http://127.0.0.1:8080/.
+In AP mode: http://192.168.1.10:8080/.
 
 
+## On raspberry
+
+The Pi is already containing the nessesary program and conf.
+
+### Mode: normal wifi
+edit:
+```bash
+sudo nano /etc/dhcpcd.conf
+# then comment last lines of file
+
+
+sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf.accesspoint
+sudo mv /etc/dnsmasq.conf.orig /etc/dnsmasq.conf 
+
+sudo systemctrl stop hostapd
+sudo systemctrl disable hostapd
+sudo reboot
+```
+
+
+
+### Mode: access point wifi
+
+Be sure you are currently in normal wifi mode !
+
+```bash
+sudo nano /etc/dhcpcd.conf
+# then uncomment last lines of file
+
+sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf.orig
+sudo mv /etc/dnsmasq.conf.accesspoint /etc/dnsmasq.conf 
+
+sudo systemctrl stop hostapd
+sudo systemctrl enable hostapd
+sudo reboot
+```
