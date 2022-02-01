@@ -2,29 +2,27 @@
 
 A Python web server aims to receive and display Arduino messages.
 
-**Note**: All POST request to the API need to be formated (examples bellow) AND the http content type requires to be "binary".
+**Note**: All POST request to the API need to be formated (examples bellow) AND the http content type requires to be "binary". The data is the concatenation of the parameters data.
 
-## 1 ) Send messages
+## 1 ) Send messages
 
 A message is a **fixed length binary** that follows this rule:
 ```text
-[_____id_____][_____angle_____][_____distance_____]
+[_____angle_____][_____distance_____]
 
-|____parameter___|____Bytes____|_____example____|_________usage note___________|
-| id             | 6 bytes     |  luc123        |  use ascii char [a-Z0-9]     |
-| angle          | 6 bytes     |  110.10        |  min=000.00 ; max=360.00     |
-| distance       | 6 bytes     |  000.50        |  min=000.00 ; max=999.99     |
+|____parameter___|____Bytes____|_____example________|______________usage note_________________|
+| angle          | 1 bytes     |  0x05              |  min=000.00 ; max=255                   |
+| distance       | 4 bytes     |  0x04950000        |  min=-1.17549e-38 ; max=3.40282e+38     |
 
 ************************** BASIC EXAMPLE   ************************************
 To send the following:
-id=luc123
-angle=110.10
-distance=000.50
+angle=0x05
+distance=0x04950000
 
 You'll have to send an API request to POST an HTTP request to: 
 http://192.168.1.10:8080
 With data equal to:
-"luc123110.10000.50"
+"0x0504950000"
 ```
 
 Graphical representation:
@@ -34,7 +32,7 @@ Graphical representation:
                                               |  Raspberry Pi  |
                                               |                |
  _________     http://192.168.1.10:8080/api   |                |
-|         |     POST: "luc123110.10000.50"    |                |
+|         |     POST: "0x0504950000"          |                |
 | Arduino |  -------------------------------> |      API       |
 |         |  <------------------------------- |                |
 | sensors |              200 / OK             |       |        |
@@ -53,31 +51,27 @@ Graphical representation:
 
 ```
 
-## 2 ) Send messages with images
+## 2 ) Send messages with images
 
-A message is a **fixed length binary** (variable length **only** for image)that follows this rule:
-
+A message is a **variable length binary** that follows this rule:
 ```text
+[_____angle_____][_____distance_____][_____image_____]
 
-[_____id_____][_____angle_____][_____distance_____][_____image_____]
+|____parameter___|____Bytes____|_____example________|______________usage note_________________|
+| angle          | 1 bytes     |  0x05              |  min=000.00 ; max=255                   |
+| distance       | 4 bytes     |  0x04950000        |  min=-1.17549e-38 ; max=3.40282e+38     |
+| image          | X bytes     |       -            |  image file raw jpg bytes               |
 
-|____parameter___|____Bytes____|_____example____|_________usage note___________|
-| id             | 6 bytes     |  luc123        |  use ascii char [a-Z0-9]     |
-| angle          | 6 bytes     |  110.10        |  min=000.00 ; max=360.00     |
-| distance       | 6 bytes     |  000.50        |  min=000.00 ; max=999.99     |
-| image          | 0-oo bytes  |       -        |  image file untouched bytes  |
-
-************************** IMAGE EXAMPLE   ************************************
+************************** BASIC EXAMPLE   ************************************
 To send the following:
-id=luc123
-angle=110.10
-distance=000.50
-image=image file untouched bytes
+angle=0x05
+distance=0x04950000
+image=image file raw jpg bytes
 
 You'll have to send an API request to POST an HTTP request to: 
 http://192.168.1.10:8080
 With data equal to:
-"luc123110.10000.50xxxx..."
+"0x0504950000xxxx[...]xxx"
 ```
 
 Graphical representation:
@@ -87,7 +81,7 @@ Graphical representation:
                                                   |  Raspberry Pi  |
                                                   |                |
  _________     http://192.168.1.10:8080/api       |                |
-|         |   POST: "luc123110.10000.50xxxx..."   |                |
+|         |   POST: "0x0504950000xxxx[...]xxx"    |                |
 | Arduino |  ------------------------------->     |      API       |
 |         |  <-------------------------------     |                |
 | sensors |              200 / OK                 |       |        |
@@ -107,7 +101,7 @@ Graphical representation:
 ```
 
 
-## Installation
+## Installation
 
 **Note**: This is only for the teacher.
 
@@ -130,7 +124,7 @@ Local mode: http://127.0.0.1:8080/.
 In AP mode: http://192.168.1.10:8080/.
 
 
-## On raspberry
+## On raspberry
 
 The Pi is already containing the nessesary program and conf (using [this](https://www.raspberrypi.org/documentation/configuration/wireless/access-point-routed.md)).
 
@@ -166,8 +160,3 @@ sudo systemctrl stop hostapd
 sudo systemctrl enable hostapd
 sudo reboot
 ```
-
-
-## TODO
-
-* Test and fix error on web page for images (display using `<img>` and base64 encode)

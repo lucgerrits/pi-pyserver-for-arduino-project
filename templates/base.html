@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Security camera</title>
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    {{ bootstrap.load_css() }}
+<!--    {{ bootstrap.load_css() }} -->
 
     <link rel='stylesheet' href="{{ url_for('static', filename='fontawesome-free-5.15.2-web/css/all.min.css')}}">
 
@@ -44,12 +44,12 @@
 
     <footer class="text-center">
         {% block footer %}
-            <small> &copy; <script>document.write(new Date().getFullYear())</script> <a href="#" title="Written by Grey Li">Luc Gerrits</a>
+            <small> &copy; <script>document.write(new Date().getFullYear())</script> <a href="#">Luc Gerrits</a>
             </small>
         {% endblock %}
     </footer>
 
-    {{ bootstrap.load_js() }}
+<!--    {{ bootstrap.load_js() }} -->
 
     <script>
         var urlParams = new URLSearchParams(window.location.search);

@@ -3,6 +3,9 @@ from flask import Flask, render_template, request, flash, Markup, jsonify
 from flask_bootstrap import Bootstrap
 from datetime import datetime
 import codecs
+import struct
+import time
+from base64 import b64encode
 
 app = Flask(__name__)
 
@@ -16,38 +19,46 @@ app.config['BOOTSTRAP_BTN_SIZE'] = 'sm'
 bootstrap = Bootstrap(app)
 
 mycache = []
-mycache_max_size = 50
+mycache_max_size = 30
 
 
-def isPostDataOK(data):
+def isPostDataOK(data, ip_addr):
     total_bytes = len(data)
-
-    # test bytes for ID, angle and distance
-    # So: 6 + 6 + 6 bytes = 18 bytes minimum
-    if total_bytes < 6:
-        return 'ERROR: Missing "id".', 400
-    if total_bytes < 12:
+    print("")
+    if total_bytes < 1:
+        print("{} : {}".format(ip_addr, 'ERROR: Missing "angle".'))
         return 'ERROR: Missing "angle".', 400
-    if total_bytes < 18:
+    if total_bytes < 2:
+        print("{} : bytes={} angle={} ERROR={}".format(
+            ip_addr,
+            total_bytes,
+            int(data[0]),
+            'ERROR: Missing "distance".'))
         return 'ERROR: Missing "distance".', 400
     else:
+        print("{} : bytes={} angle={} distance={}".format(
+            ip_addr,
+            total_bytes,
+            int(data[0]),
+            "{:.2f}".format(struct.unpack('f', data[1:5])[0]))
+        )
         return True
 
 
 def parsePostData(data):
-    data = data.strip()
     d = dict()
-    myid = data[0:6].decode("ascii")
-    myangle = data[6:12].decode("ascii")
-    mydistance = data[12:18].decode("ascii")
+    myangle = int(data[0])
+    mydistance = "{:.2f}".format(struct.unpack('f', data[1:5])[0])
 
-    # file in hex encoding doesn't work
-    # myimage = codecs.encode(data[18:], 'base64').decode("ascii")
+    # plz send file directly as bytes
+    if len(data[5:]) > 2:
+        print("Taille image recue:")
+        print(len(data[5:]))
+        myimage = "data:image/png;base64, " + \
+            b64encode(data[5:]).decode("utf-8")
+    else:
+        myimage = "/static/user.png"
 
-    # plz send file directly as an PNG base64 string
-    myimage = data[18:].decode("ascii")
-
-    d['id'] = myid
     d['angle'] = myangle
     d['distance'] = mydistance
     d['image'] = myimage
@@ -57,39 +68,32 @@ def parsePostData(data):
 @app.route('/')
 def index():
     msg_len = len(mycache)
-    # msg_range = []
-    # i = 0
-    # for i in range(int(msg_len), 0, -1):
-    #     msg_range.append(int(i))
-    # print(msg_len)
-    # print(msg_range)
-    return render_template('index.html', messages=mycache, messages_len=msg_len) #, messages_range=msg_range
+    return render_template('index.html', messages=mycache, messages_len=msg_len)
 
 
 @app.route('/api', methods=['GET', 'POST'])
 def api():
     if request.method == 'POST':
-        if isPostDataOK(request.data) == True:
+        if isPostDataOK(request.data, str(request.remote_addr)) == True:
             table_len = len(mycache)
             if table_len >= mycache_max_size:
                 mycache.pop(0)
             table_len = len(mycache)
             message = parsePostData(request.data)
-            # print(message)
             now = datetime.now()
             # dd/mm/YY H:M:S
             dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
             mycache.append({
                 "create_time": dt_string,
-                # "id": message.get('id'),
-                "id": table_len+1,
+                "ip": str(request.remote_addr),
                 "angle": message.get('angle'),
                 "distance": message.get('distance'),
                 "image": message.get('image')
             })
+            time.sleep(0.5)  # si on a wifiesp error: augmenter ??
             return 'OK'
         else:
-            return isPostDataOK(request.data)
+            return isPostDataOK(request.data, str(request.remote_addr))
 
     else:
         return 'ERROR: Please send POST request.', 400
